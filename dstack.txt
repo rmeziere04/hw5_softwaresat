@@ -1,0 +1,33 @@
+#!/bin/bash
+set -euo pipefail
+
+dpush() {
+if [[ -f /tmp/dstack ]]; then
+echo "dstack already exists!"
+else
+echo "dstack file not found, creating new dstack..."
+touch /tmp/dstack
+fi
+echo "adding directory to dstack..."
+pwd >> /tmp/dstack
+}
+
+dpop() {
+if [[ ! -f /tmp/dstack ]]; then
+echo "dstack does not exist."
+return 2
+#checks if search for line number returns false or true
+elif [[ $(wc -l < /tmp/dstack) -eq 0 ]]; then
+echo "dstack exists but is empty!"
+return 1
+fi
+
+#has to be made here before we change the stack
+topdir=$(tail -1 /tmp/dstack)
+
+#creates var with all but last line then writes it into the file
+nolast=$(head -n -1 /tmp/dstack)
+echo "$nolast" > /tmp/dstack
+
+cd "$topdir"
+}
